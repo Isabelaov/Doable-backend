@@ -6,6 +6,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -13,11 +14,14 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
   const config = new DocumentBuilder()
     .setTitle('Doable Auth Backend')
     .setDescription('Doable API for authentication and authorization')
+    .addBearerAuth()
     .setVersion('1.0')
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 

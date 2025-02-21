@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -13,6 +15,7 @@ import { ConfigService } from '@nestjs/config';
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {}
@@ -43,7 +46,7 @@ export class AuthService {
 
       return payload;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new UnauthorizedException(error.message);
     }
   }
 }

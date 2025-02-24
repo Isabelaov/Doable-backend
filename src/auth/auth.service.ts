@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login.dto';
 import { UserService } from 'src/user/user.service';
 import { ConfigService } from '@nestjs/config';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -29,10 +30,12 @@ export class AuthService {
         throw new UnauthorizedException('Invalid credentials');
       }
 
+      const result: Omit<User, 'password'> = user;
+
       const payload = { id: user.id };
-      return { token: this.jwtService.sign(payload) };
+      return { token: this.jwtService.sign(payload), user: result };
     } catch (error) {
-      console.log(error);
+      console.error(error);
 
       throw new BadRequestException(error.message);
     }

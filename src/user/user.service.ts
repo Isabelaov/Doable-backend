@@ -23,7 +23,8 @@ export class UserService {
   async create(dto: CreateUserDto) {
     try {
       const user = this.userRepository.create(dto);
-      const { password, ...result } = await this.userRepository.save(user);
+      const result: Omit<User, 'password'> =
+        await this.userRepository.save(user);
       return result;
     } catch (error) {
       throw new BadRequestException(error);
@@ -35,7 +36,7 @@ export class UserService {
       await this.findById(id);
       await this.userRepository.update(id, dto);
 
-      return 'User updated';
+      return await this.findById(id);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -45,7 +46,7 @@ export class UserService {
     const parsedEmail = email.toLocaleLowerCase();
     const user = await this.userRepository.findOne({
       where: { email: parsedEmail },
-      select: ['password', 'id'],
+      select: ['password', 'id', 'name', 'email'],
     });
 
     if (!user)
@@ -57,7 +58,6 @@ export class UserService {
   async findById(id: number) {
     const user = await this.userRepository.findOne({
       where: { id },
-      select: ['password', 'id', 'name', 'email'],
     });
 
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
